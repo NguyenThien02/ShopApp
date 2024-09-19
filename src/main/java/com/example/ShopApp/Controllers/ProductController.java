@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,8 +50,12 @@ public class ProductController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
-            MultipartFile file = productDTO.getFile();
-            if (file != null) {
+            List<MultipartFile> files = productDTO.getFiles();
+            files = files == null ? new ArrayList<MultipartFile>() : files;
+            for (MultipartFile file : files) {
+                if(file.getSize() == 0){
+                    continue;
+                }
                 //Kiểm tra kích thước file và định dạng file
                 if (file.getSize() > 10 * 1024 * 1024) {// > 10MB
                     return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).
@@ -70,15 +75,16 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     //Lưu file
-    private String storeFile(MultipartFile file) throws IOException{
+    private String storeFile(MultipartFile file) throws IOException {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         //Thêm UUID vào trước tên file để đảm bảo tên file là duy nhất
         String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
         // Đường dẫn đến thư mục mà bạn muốn lưu file
         Path uploadDir = Paths.get("uploads");
         //Kiểm tra và tạo thư mục nếu không tồn tại
-        if(!Files.exists(uploadDir)){
+        if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
         //Đường dẫn đầy đủ đến file
