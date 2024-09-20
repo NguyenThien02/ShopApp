@@ -1,6 +1,19 @@
 #spring.application.name=ShopApp
 
 spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/ShopApp?useSSL=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: Thien?1010
+  jpa:
+    show-sql: true #khi chạy nhìn thấy các câu lệnh SQL hiện ra
+    hibernate:
+      ddl-auto: none #Những câu lệnh tạo bảng, tạo thực thể trên java spring sẽ không tự động tạo các table bên trong cơ sở dũ liệu
+    properties:
+      hibernate:
+      dialect: org.hibernate.dialect.MySQL8Dialect # Driver kết nối với cơ sở dữ liệu
+      format_sql: true
   servlet:
     multipart:
       max-file-size: 10MB
