@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Không có bản ghi nào giống nhau, tự tăng lên 1
