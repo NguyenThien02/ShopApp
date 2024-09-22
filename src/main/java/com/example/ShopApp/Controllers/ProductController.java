@@ -1,7 +1,12 @@
 package com.example.ShopApp.Controllers;
 
 import com.example.ShopApp.dtos.ProductDTO;
+import com.example.ShopApp.dtos.ProductImageDTO;
+import com.example.ShopApp.models.Product;
+import com.example.ShopApp.models.ProductImage;
+import com.example.ShopApp.services.ProductService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,23 +28,14 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("${api.prefix}/products")
+@RequiredArgsConstructor
 public class ProductController {
-    @GetMapping("")
-    public ResponseEntity<String> getProducts(
-            @RequestParam("page") int page,
-            @RequestParam("limit") int limit
-    ) {
-        return ResponseEntity.ok("get Products here");
-    }
+    private final ProductService productService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<String> getProductById(@PathVariable("id") String productId) {
-        return ResponseEntity.ok("Product with id: " + productId);
-    }
-
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    //Thêm mới product
+    @PostMapping("")
     public ResponseEntity<?> createProduct(
-            @Valid @ModelAttribute ProductDTO productDTO,
+            @Valid @RequestBody ProductDTO productDTO,
             BindingResult result
     ) {
         try {
@@ -50,7 +46,24 @@ public class ProductController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
-            List<MultipartFile> files = productDTO.getFiles();
+            Product newProduct = productService.createProduct(productDTO);
+            return ResponseEntity.ok(newProduct);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    //Upload file anh product
+    @PostMapping(value = "uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImagesProduct(
+            @PathVariable("id") Long productId,
+            @ModelAttribute("files") List<MultipartFile> files){
+        try{
+            if(files.size() > ProductImage.MAXIMUM_IMAGES_PER_PRODUCT){
+                return ResponseEntity.badRequest().body("You can only upload maximum " +
+                        ProductImage.MAXIMUM_IMAGES_PER_PRODUCT + " image");
+            }
+            Product existingProduct = productService.getProductById(productId);
+            List<ProductImage> productImages = new ArrayList<>();
             files = files == null ? new ArrayList<MultipartFile>() : files;
             for (MultipartFile file : files) {
                 if(file.getSize() == 0){
@@ -69,11 +82,20 @@ public class ProductController {
                 }
                 //Lưu file và cập nhật thumbnail trong DTO
                 String filename = storeFile(file);
+                //Tạo ảnh lưu vào data base
+
+                ProductImage productImage  = productService.createProductImage(existingProduct.getId(),
+                        ProductImageDTO.builder()
+                                .productId(existingProduct.getId())
+                                .imageUrl(filename)
+                                .build());
+                productImages.add(productImage);
             }
-            return ResponseEntity.ok("Product created successfully");
-        } catch (Exception e) {
+            return ResponseEntity.ok().body(productImages);
+        }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+
     }
 
     //Lưu file
@@ -92,6 +114,19 @@ public class ProductController {
         //Sao chép file vào thư mục đích
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
         return uniqueFilename;
+    }
+
+    @GetMapping("")
+    public ResponseEntity<String> getProducts(
+            @RequestParam("page") int page,
+            @RequestParam("limit") int limit
+    ) {
+        return ResponseEntity.ok("get Products here");
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<String> getProductById(@PathVariable("id") String productId) {
+        return ResponseEntity.ok("Product with id: " + productId);
     }
 
 

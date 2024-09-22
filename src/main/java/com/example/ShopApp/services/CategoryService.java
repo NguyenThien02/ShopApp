@@ -11,8 +11,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryService implements ICategoryService{
+public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
+
     @Override
     public Category createCategory(CategoryDTO categoryDTO) {
         Category newCategory = Category
