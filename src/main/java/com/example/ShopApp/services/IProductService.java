@@ -8,6 +8,8 @@ import com.example.ShopApp.models.ProductImage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
+
 public interface IProductService {
     Product createProduct(ProductDTO productDTO) throws DataNotFoundException;
 
@@ -22,4 +24,6 @@ public interface IProductService {
     boolean existsByName(String name);
 
     ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception;
+
+    List<ProductImage> allImagesProductById(Long productId);
 }

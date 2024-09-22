@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -101,4 +102,12 @@ public class ProductService implements IProductService {
         }
         return productImageRepository.save(newProductImage);
     }
+
+    // Lấy tất cả các ảnh có productId=?
+    @Override
+    public List<ProductImage> allImagesProductById(Long productId) {
+        List<ProductImage> productImages = productImageRepository.findByProductId(productId);
+        return productImages;
+    }
+
 }

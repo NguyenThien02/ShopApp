@@ -2,6 +2,7 @@ package com.example.ShopApp.Controllers;
 
 import com.example.ShopApp.dtos.ProductDTO;
 import com.example.ShopApp.dtos.ProductImageDTO;
+import com.example.ShopApp.models.Category;
 import com.example.ShopApp.models.Product;
 import com.example.ShopApp.models.ProductImage;
 import com.example.ShopApp.services.ProductService;
@@ -116,6 +117,18 @@ public class ProductController {
         return uniqueFilename;
     }
 
+    // Lấy tất cả các ảnh có productId=?
+    @GetMapping("images/{id}")
+    public ResponseEntity<?> getImagesAllProductById(@PathVariable("id") Long productId){
+        List<ProductImage> productListImage = productService.allImagesProductById(productId);
+        ArrayList<String> nameImages = new ArrayList<>();
+        for(ProductImage productImage:productListImage){
+            nameImages.add(productImage.getImageUrl());
+        }
+        return ResponseEntity.ok().body(nameImages) ;
+    }
+
+
     @GetMapping("")
     public ResponseEntity<String> getProducts(
             @RequestParam("page") int page,
@@ -123,15 +136,16 @@ public class ProductController {
     ) {
         return ResponseEntity.ok("get Products here");
     }
-
+    //Lấy ra một product có Id=?
     @GetMapping("/{id}")
-    public ResponseEntity<String> getProductById(@PathVariable("id") String productId) {
-        return ResponseEntity.ok("Product with id: " + productId);
+    public ResponseEntity<?> getProductById(@PathVariable("id") Long productId) throws Exception {
+        return ResponseEntity.ok().body(productService.getProductById(productId)) ;
     }
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable("id") int productId) {
+
         return ResponseEntity.ok(String.format("Product deleted with id %d successfully", productId));
     }
 }
