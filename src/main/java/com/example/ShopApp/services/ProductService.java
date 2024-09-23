@@ -10,6 +10,7 @@ import com.example.ShopApp.models.ProductImage;
 import com.example.ShopApp.repositories.CategoryRepository;
 import com.example.ShopApp.repositories.ProductImageRepository;
 import com.example.ShopApp.repositories.ProductRepository;
+import com.example.ShopApp.responses.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -52,9 +53,20 @@ public class ProductService implements IProductService {
     }
     //Lấy danh sách tất cả các Products theo Page và Limit
     @Override
-    public Page<Product> getAllProducts(PageRequest pageRequest) {
-        return productRepository.findAll(pageRequest);
+    public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
+        return productRepository.findAll(pageRequest).map(product -> {
+            ProductResponse productResponse = ProductResponse.builder()
+                    .name(product.getName())
+                    .price(product.getPrice())
+                    .thumbnail(product.getThumbnail())
+                    .categoryId(product.getCategory().getId())
+                    .build();
+            productResponse.setCreatedAt(product.getCreatedAt());
+            productResponse.setUpdatedAt(product.getUpdatedAt());
+            return productResponse;
+        });
     }
+
     //Cập nhật Product
     @Override
     public Product updateProduct(Long id, ProductDTO productDTO) throws Exception {

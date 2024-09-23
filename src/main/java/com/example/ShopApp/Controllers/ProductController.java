@@ -5,9 +5,13 @@ import com.example.ShopApp.dtos.ProductImageDTO;
 import com.example.ShopApp.models.Category;
 import com.example.ShopApp.models.Product;
 import com.example.ShopApp.models.ProductImage;
+import com.example.ShopApp.responses.ProductResponse;
 import com.example.ShopApp.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -128,13 +132,21 @@ public class ProductController {
         return ResponseEntity.ok().body(nameImages) ;
     }
 
-
+    //Lấy ra danh sách product
     @GetMapping("")
-    public ResponseEntity<String> getProducts(
+    public ResponseEntity<List<ProductResponse>> getProducts(
             @RequestParam("page") int page,
             @RequestParam("limit") int limit
     ) {
-        return ResponseEntity.ok("get Products here");
+        //Tạo ra pageable từ thông tin trang và giới hạn
+        PageRequest pageRequests = PageRequest.of(
+                page, limit,
+        Sort.by("createdAt").descending());
+        Page<ProductResponse> productPage = productService.getAllProducts(pageRequests);
+        // Lẩy ra tổng số trang
+        int totalPages = productPage.getTotalPages();
+        List<ProductResponse> products = productPage.getContent();
+        return ResponseEntity.ok(products);
     }
     //Lấy ra một product có Id=?
     @GetMapping("/{id}")
