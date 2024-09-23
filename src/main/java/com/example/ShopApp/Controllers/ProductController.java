@@ -5,6 +5,7 @@ import com.example.ShopApp.dtos.ProductImageDTO;
 import com.example.ShopApp.models.Category;
 import com.example.ShopApp.models.Product;
 import com.example.ShopApp.models.ProductImage;
+import com.example.ShopApp.responses.ProductListResponse;
 import com.example.ShopApp.responses.ProductResponse;
 import com.example.ShopApp.services.ProductService;
 import jakarta.validation.Valid;
@@ -134,7 +135,7 @@ public class ProductController {
 
     //Lấy ra danh sách product
     @GetMapping("")
-    public ResponseEntity<List<ProductResponse>> getProducts(
+    public ResponseEntity<ProductListResponse> getProducts(
             @RequestParam("page") int page,
             @RequestParam("limit") int limit
     ) {
@@ -146,7 +147,10 @@ public class ProductController {
         // Lẩy ra tổng số trang
         int totalPages = productPage.getTotalPages();
         List<ProductResponse> products = productPage.getContent();
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(ProductListResponse.builder()
+                        .products(products)
+                        .totalPages(totalPages)
+                        .build());
     }
     //Lấy ra một product có Id=?
     @GetMapping("/{id}")

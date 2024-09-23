@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ProductListResponse {
     private List<ProductResponse> products;
     private int totalPages;
