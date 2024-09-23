@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-//    boolean existByName(String name); // Xem sản phẩm có tên đó có tồn tại hay không
-
+    boolean existsByName(String name); // Xem sản phẩm có tên đó có tồn tại hay không
+    boolean existsByCategoryId(Long categoryId);
 //    @Override
 //    Page<Product> findAll(Pageable pageable); // Phân trang
 }

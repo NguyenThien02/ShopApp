@@ -2,12 +2,14 @@ package com.example.ShopApp.Controllers;
 
 import com.example.ShopApp.dtos.ProductDTO;
 import com.example.ShopApp.dtos.ProductImageDTO;
+import com.example.ShopApp.exceptions.DataNotFoundException;
 import com.example.ShopApp.models.Category;
 import com.example.ShopApp.models.Product;
 import com.example.ShopApp.models.ProductImage;
 import com.example.ShopApp.responses.ProductListResponse;
 import com.example.ShopApp.responses.ProductResponse;
 import com.example.ShopApp.services.ProductService;
+import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -163,5 +165,40 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable("id") int productId) {
 
         return ResponseEntity.ok(String.format("Product deleted with id %d successfully", productId));
+    }
+
+    //Faker
+    //@PostMapping("/generateFakeProducts")
+    public ResponseEntity<String> generateFakeProducts() {
+        Faker faker = new Faker();
+        for(int i=0; i<100; i++){
+            String productName = faker.commerce().productName();
+            if(productService.existsByName(productName)){
+                continue;
+            }
+            ProductDTO productDTO = ProductDTO.builder()
+                    .name(productName)
+                    .price((float)faker.number().numberBetween(10,90000000))
+                    .description(faker.lorem().sentence())
+                    .thumbnail("")
+                    .categoryId((long) faker.number().numberBetween(2,6))
+                    .build();
+            if(!productService.existsByCategoryId(productDTO.getCategoryId())){
+                continue;
+            }
+            try {
+                productService.createProduct(productDTO);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+        }
+        return ResponseEntity.ok("Fake Products created successfully");
+    }
+
+    //Xóa toàn bộ product
+    @DeleteMapping("/deletes")
+    public ResponseEntity<String> deleteAllProducts(){
+        productService.deleteAllProducts();
+        return ResponseEntity.ok("Delete all product successfully");
     }
 }

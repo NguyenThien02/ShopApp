@@ -22,9 +22,13 @@ public interface IProductService {
 
     void deteleProduct(Long id);
 
+    void deleteAllProducts();
+
     boolean existsByName(String name);
 
     ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception;
 
     List<ProductImage> allImagesProductById(Long productId);
+
+    boolean existsByCategoryId(Long categoryId);
 }

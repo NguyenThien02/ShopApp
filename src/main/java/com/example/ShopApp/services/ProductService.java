@@ -39,6 +39,7 @@ public class ProductService implements IProductService {
         Product newProduct = Product.builder()
                 .name(productDTO.getName())
                 .price(productDTO.getPrice())
+                .description(productDTO.getDescription())
                 .thumbnail(productDTO.getThumbnail())
                 .category(existingCategory)
                 .build();
@@ -59,6 +60,7 @@ public class ProductService implements IProductService {
                     .name(product.getName())
                     .price(product.getPrice())
                     .thumbnail(product.getThumbnail())
+                    .description(product.getDescription())
                     .categoryId(product.getCategory().getId())
                     .build();
             productResponse.setCreatedAt(product.getCreatedAt());
@@ -81,17 +83,17 @@ public class ProductService implements IProductService {
         existingProduct.setThumbnail(productDTO.getThumbnail());
         return productRepository.save(existingProduct);
     }
-    //Xóa product có id=?
-    @Override
-    public void deteleProduct(Long id) {
-//        productRepository.deleteById(id);
-        Optional<Product> optionalProduct = productRepository.findById(id);
-        optionalProduct.ifPresent(productRepository::delete);
-    }
+
     //kiểm tra xem product có name=? hay không
     @Override
     public boolean existsByName(String name) {
-        return true;
+        return productRepository.existsByName(name);
+    }
+
+    //Kiểm tra xem đã có categoryId này trong bảng category khong
+    @Override
+    public boolean existsByCategoryId(Long categoryId) {
+        return categoryRepository.existsById(categoryId);
     }
 
     //Thêm ảnh cho product
@@ -120,6 +122,19 @@ public class ProductService implements IProductService {
     public List<ProductImage> allImagesProductById(Long productId) {
         List<ProductImage> productImages = productImageRepository.findByProductId(productId);
         return productImages;
+    }
+
+    //Xóa product có id=?
+    @Override
+    public void deteleProduct(Long id) {
+//        productRepository.deleteById(id);
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        optionalProduct.ifPresent(productRepository::delete);
+    }
+
+    @Override
+    public void deleteAllProducts() {
+        productRepository.deleteAll();
     }
 
 }
