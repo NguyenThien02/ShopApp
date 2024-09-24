@@ -2,7 +2,11 @@ package com.example.ShopApp.Controllers;
 
 
 import com.example.ShopApp.dtos.*;
+import com.example.ShopApp.models.Order;
+import com.example.ShopApp.responses.OrderResponse;
+import com.example.ShopApp.services.OrderService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -11,8 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("${api.prefix}/orders")
 public class OrderController {
+    private final OrderService orderService;
+
     @PostMapping("")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderDTO orderDTO,
                                          BindingResult result) {
@@ -27,7 +34,8 @@ public class OrderController {
             if(orderDTO.getPhoneNumber().length() != 10){
                 return ResponseEntity.badRequest().body("Invalid phone number");
             }
-            return ResponseEntity.ok("Create order successfully");
+            Order order = orderService.creatOrder(orderDTO);
+            return ResponseEntity.ok(order);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

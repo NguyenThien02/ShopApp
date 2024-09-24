@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.XSlf4j;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -38,12 +39,6 @@ public class Order {
     @Column(name = "note", length = 100)
     private String note;
 
-    @Column(name = "order_date")
-    private LocalDateTime orderDate;
-
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "total_money")
     private Float totalMoney;
 
@@ -53,14 +48,20 @@ public class Order {
     @Column(name = "shipping_address", length = 200)
     private String shippingAddress;
 
+    @Column(name = "payment_method", length = 100)
+    private String paymentMethod;
+
+    @Column(name = "order_date")
+    private Date orderDate;
+
+    @Column(name = "status")
+    private String status;
+
     @Column(name = "shipping_date")
-    private Date shippingDate;
+    private LocalDate shippingDate;
 
     @Column(name = "tracking_number",length = 100)
     private String trackingNumber;
-
-    @Column(name = "payment_method", length = 100)
-    private String paymentMethod;
 
     @Column(name = "active")
     private Boolean active;

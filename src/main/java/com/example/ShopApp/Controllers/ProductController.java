@@ -213,5 +213,4 @@ public class ProductController {
         }
         return ResponseEntity.ok("Fake Products created successfully");
     }
-
 }
