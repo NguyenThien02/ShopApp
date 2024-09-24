@@ -135,7 +135,7 @@ public class ProductController {
         return ResponseEntity.ok().body(nameImages) ;
     }
 
-    //Lấy ra danh sách product
+    //Lấy ra danh sách product theo trang
     @GetMapping("")
     public ResponseEntity<ProductListResponse> getProducts(
             @RequestParam("page") int page,
@@ -157,14 +157,33 @@ public class ProductController {
     //Lấy ra một product có Id=?
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable("id") Long productId) throws Exception {
-        return ResponseEntity.ok().body(productService.getProductById(productId)) ;
+        Product existingProduct = productService.getProductById(productId);
+        return ResponseEntity.ok().body(ProductResponse.fromProduct(existingProduct)) ;
     }
 
-
+    // Xóa Product với id =?
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable("id") int productId) {
-
+    public ResponseEntity<String> deleteProduct(@PathVariable("id") Long productId) {
+        productService.deteleProduct(productId);
         return ResponseEntity.ok(String.format("Product deleted with id %d successfully", productId));
+    }
+    //Xóa toàn bộ product
+    @DeleteMapping("/deletes")
+    public ResponseEntity<String> deleteAllProducts(){
+        productService.deleteAllProducts();
+        return ResponseEntity.ok("Delete all product successfully");
+    }
+
+    //Update product vơi id = ?
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateProductById(@PathVariable("id") Long id,
+                                               @RequestBody ProductDTO productDTO){
+        try {
+            productService.updateProduct(id,productDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.ok().body("Update Product with id = " + id + "successfully");
     }
 
     //Faker
@@ -195,10 +214,4 @@ public class ProductController {
         return ResponseEntity.ok("Fake Products created successfully");
     }
 
-    //Xóa toàn bộ product
-    @DeleteMapping("/deletes")
-    public ResponseEntity<String> deleteAllProducts(){
-        productService.deleteAllProducts();
-        return ResponseEntity.ok("Delete all product successfully");
-    }
 }

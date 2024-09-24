@@ -55,18 +55,9 @@ public class ProductService implements IProductService {
     //Lấy danh sách tất cả các Products theo Page và Limit
     @Override
     public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
-        return productRepository.findAll(pageRequest).map(product -> {
-            ProductResponse productResponse = ProductResponse.builder()
-                    .name(product.getName())
-                    .price(product.getPrice())
-                    .thumbnail(product.getThumbnail())
-                    .description(product.getDescription())
-                    .categoryId(product.getCategory().getId())
-                    .build();
-            productResponse.setCreatedAt(product.getCreatedAt());
-            productResponse.setUpdatedAt(product.getUpdatedAt());
-            return productResponse;
-        });
+        return productRepository
+                .findAll(pageRequest)
+                .map(ProductResponse::fromProduct);
     }
 
     //Cập nhật Product
@@ -127,9 +118,9 @@ public class ProductService implements IProductService {
     //Xóa product có id=?
     @Override
     public void deteleProduct(Long id) {
-//        productRepository.deleteById(id);
-        Optional<Product> optionalProduct = productRepository.findById(id);
-        optionalProduct.ifPresent(productRepository::delete);
+        productRepository.deleteById(id);
+//        Optional<Product> optionalProduct = productRepository.findById(id);
+//        optionalProduct.ifPresent(productRepository::delete);
     }
 
     @Override
