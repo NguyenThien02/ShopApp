@@ -9,12 +9,14 @@ import com.example.ShopApp.repositories.OrderRepository;
 import com.example.ShopApp.repositories.UserRepository;
 import com.example.ShopApp.responses.OrderResponse;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -23,6 +25,8 @@ public class OrderService implements IOrederService{
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+
+    //Tạo mới một order
     @Override
     public Order creatOrder(OrderDTO orderDTO) throws Exception {
         // Tìm xem user id có tồn tại hay không
@@ -51,24 +55,42 @@ public class OrderService implements IOrederService{
         return order;
     }
 
+    // Lấy ra danh sách chi tiết một Order có Id = ?
     @Override
-    public Order getOrderById(Long id) {
-
-        return null;
+    public Order getOrderById(Long id) throws DataNotFoundException {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("cannot find order with id: " + id));
     }
 
+    // cập nhật đơn hàng order
     @Override
-    public Order updateOrder(Long id, OrderDTO orderDTO) {
-        return null;
+    public Order updateOrder(Long id, OrderDTO orderDTO) throws DataNotFoundException {
+        Order existingOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find order with id: " + id));
+        User existingUser = userRepository.findById(existingOrder.getUser().getId())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find user with id: "
+                        + existingOrder.getUser().getId()));
+        //Tạo một luồng ánh xạ riêng để kiểm soát việc ánh xạ
+        modelMapper.typeMap(OrderDTO.class, Order.class)
+                .addMappings(mapper -> mapper.skip(Order::setId));
+        // Cập nhật các trường của đơn hàng từ OrderDTO
+        modelMapper.map(orderDTO,existingOrder);
+        orderRepository.save(existingOrder);
+        return existingOrder;
     }
-
+    //Xóa mềm đơn hàng có id =? (Thay active = false)
     @Override
     public void deleteOrderById(Long id) {
-
+        Order order = orderRepository.findById(id).orElse(null);
+        if(order != null){
+            order.setActive(false);
+            orderRepository.save(order);
+        }
     }
 
+    // Lấy ra danh sách các order của một User có id = ?
     @Override
-    public List<Order> getAllOrders(Long userId) {
-        return List.of();
+    public List<Order> findByUserId(Long userId) {
+        return orderRepository.findByUserId(userId);
     }
 }

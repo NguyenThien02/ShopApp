@@ -2,6 +2,7 @@ package com.example.ShopApp.Controllers;
 
 
 import com.example.ShopApp.dtos.*;
+import com.example.ShopApp.exceptions.DataNotFoundException;
 import com.example.ShopApp.models.Order;
 import com.example.ShopApp.responses.OrderResponse;
 import com.example.ShopApp.services.OrderService;
@@ -20,6 +21,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
+    //Tạo mới một order
     @PostMapping("")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderDTO orderDTO,
                                          BindingResult result) {
@@ -41,27 +43,50 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/{user_id}")
+    // Lấy ra danh sách các order của một User có id = ?
+    @GetMapping("/user/{user_id}")
     public ResponseEntity<?> getOrders(@Valid @PathVariable("user_id") long userId){
         try{
-            return ResponseEntity.ok("Lấy ra danh sách order từ user_id: " + userId);
+            List<Order> orders = orderService.findByUserId(userId);
+            return ResponseEntity.ok(orders);
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    // Lấy ra danh sách chi tiết một Order có Id = ?
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrder(@Valid @PathVariable("id") Long id){
+        try{
+            Order existingOrder = orderService.getOrderById(id);
+            return ResponseEntity.ok(existingOrder);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // cập nhật đơn hàng order
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOrder(
             @Valid @PathVariable("id") long id,
             @Valid @RequestBody OrderDTO orderDTO
     ){
-        return ResponseEntity.ok("Update succussfully");
+        try{
+            Order order = orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(order);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
+    //Xóa đơn hàng có id = ?
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long id){
         //Xóa mềm => cập nhật trường active = false
+        orderService.deleteOrderById(id);
         return ResponseEntity.ok("Order delete successfully");
     }
 }
