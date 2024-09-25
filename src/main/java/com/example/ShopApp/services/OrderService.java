@@ -7,16 +7,13 @@ import com.example.ShopApp.models.OrderStatus;
 import com.example.ShopApp.models.User;
 import com.example.ShopApp.repositories.OrderRepository;
 import com.example.ShopApp.repositories.UserRepository;
-import com.example.ShopApp.responses.OrderResponse;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service

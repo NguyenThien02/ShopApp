@@ -21,7 +21,6 @@ public class OrderResponse {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "fullname")
     private String fullName;
 
     private String email;
