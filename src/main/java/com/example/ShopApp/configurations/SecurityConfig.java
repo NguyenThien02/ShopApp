@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig {
     private final UserRepository userRepository;
 
+    // Tìm ra userDetail của java security thông qua trường duy nhất phoneNumber
     @Bean
     public UserDetailsService userDetailsService() {
         return phoneNumber -> userRepository.findByPhoneNumber(phoneNumber)
@@ -27,12 +28,12 @@ public class SecurityConfig {
                         new UsernameNotFoundException(
                                 "Cannot find user with phone number = " + phoneNumber));
     }
-
+    // Mã hóa password
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    // Xác thực người dùng
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -40,7 +41,7 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
+    // Quản lý quá trình xác thực người dùng
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config
