@@ -3,6 +3,7 @@ package com.example.ShopApp.services;
 import com.example.ShopApp.components.JwtTokenUtil;
 import com.example.ShopApp.dtos.UserDTO;
 import com.example.ShopApp.exceptions.DataNotFoundException;
+import com.example.ShopApp.exceptions.InvalidParamException;
 import com.example.ShopApp.models.Role;
 import com.example.ShopApp.models.User;
 import com.example.ShopApp.repositories.RoleRepository;
@@ -35,7 +36,7 @@ public class UserService implements IUserService {
         }
         User newUser = User.builder()
                 .fullName(userDTO.getFullName())
-                .phoneNumber(userDTO.getFullName())
+                .phoneNumber(userDTO.getPhoneNumber())
                 .password(userDTO.getPassword())
                 .address(userDTO.getAddress())
                 .dateOfBirth(userDTO.getDateOfBirth())
@@ -55,7 +56,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password) throws DataNotFoundException {
+    public String login(String phoneNumber, String password) throws DataNotFoundException, InvalidParamException {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if (optionalUser.isEmpty()) {
             throw new DataNotFoundException("Invalid phone number / password");
@@ -68,8 +69,16 @@ public class UserService implements IUserService {
             }
         }
         //Authenticate(Xác thức) with Java spring security
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(phoneNumber,password);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                phoneNumber,password,existingUser.getAuthorities());
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
     }
+
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
+
 }
