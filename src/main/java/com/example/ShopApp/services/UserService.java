@@ -4,6 +4,7 @@ import com.example.ShopApp.components.JwtTokenUtil;
 import com.example.ShopApp.dtos.UserDTO;
 import com.example.ShopApp.exceptions.DataNotFoundException;
 import com.example.ShopApp.exceptions.InvalidParamException;
+import com.example.ShopApp.exceptions.PermissionDenyException;
 import com.example.ShopApp.models.Role;
 import com.example.ShopApp.models.User;
 import com.example.ShopApp.repositories.RoleRepository;
@@ -28,11 +29,16 @@ public class UserService implements IUserService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public User crateUser(UserDTO userDTO) throws DataNotFoundException {
+    public User crateUser(UserDTO userDTO) throws Exception {
         //Register user
         String phoneNumber = userDTO.getPhoneNumber();
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new DataIntegrityViolationException("Phone number already exists");
+        }
+        Role role = roleRepository.findById(userDTO.getRoleId())
+                .orElseThrow(() -> new DataNotFoundException("Role not found"));
+        if(role.getName().toUpperCase().equals(Role.ADMIN)){
+            throw new PermissionDenyException("You cannot register an admin account");
         }
         User newUser = User.builder()
                 .fullName(userDTO.getFullName())
@@ -43,8 +49,6 @@ public class UserService implements IUserService {
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
                 .build();
-        Role role = roleRepository.findById(userDTO.getRoleId())
-                .orElseThrow(() -> new DataNotFoundException("Role not found"));
         newUser.setRole(role);
         //Kiểm tra nếu có đăng nhập bằng facebook hoạc gmail thì không yêu cầu password
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {

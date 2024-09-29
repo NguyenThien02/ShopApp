@@ -83,11 +83,16 @@ public class OrderService implements IOrederService{
             order.setActive(false);
             orderRepository.save(order);
         }
+        orderRepository.deleteById(id);
     }
 
     // Lấy ra danh sách các order của một User có id = ?
     @Override
     public List<Order> findByUserId(Long userId) {
         return orderRepository.findByUserId(userId);
+    }
+
+    public void deleteAll(){
+        orderRepository.deleteAll();
     }
 }

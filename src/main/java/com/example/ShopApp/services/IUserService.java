@@ -6,7 +6,7 @@ import com.example.ShopApp.exceptions.InvalidParamException;
 import com.example.ShopApp.models.User;
 
 public interface IUserService {
-    User crateUser(UserDTO userDTO) throws DataNotFoundException;
+    User crateUser(UserDTO userDTO) throws Exception;
 
     String login(String phoneNumber, String password) throws DataNotFoundException, InvalidParamException;// Trả về một Token key
 
