@@ -32,6 +32,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     // Xác thực người dùng
     @Bean
     public AuthenticationProvider authenticationProvider() {
