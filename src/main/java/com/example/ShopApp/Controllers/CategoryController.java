@@ -2,15 +2,21 @@ package com.example.ShopApp.Controllers;
 
 import com.example.ShopApp.dtos.CategoryDTO;
 import com.example.ShopApp.models.Category;
+import com.example.ShopApp.responses.LoginResponse;
+import com.example.ShopApp.responses.UpdateCategoryResponse;
 import com.example.ShopApp.services.CategoryService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("${api.prefix}/categories")
@@ -18,6 +24,8 @@ import java.util.List;
 
 public class CategoryController {
     private final CategoryService categoryService;
+    private final MessageSource messageSource;
+    private final LocaleResolver localeResolver;
     // Tạo mới một category
     @PostMapping("")
     public ResponseEntity<?> insertCategory(@Valid @RequestBody CategoryDTO categoryDTO,
@@ -49,10 +57,14 @@ public class CategoryController {
     }
     //Cập nhật category
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateCategory(@PathVariable long id,
-                                                 @RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<UpdateCategoryResponse> updateCategory(@PathVariable long id,
+                                                 @RequestBody CategoryDTO categoryDTO,
+                                                 HttpServletRequest request) {
         categoryService.updateCategory(id,categoryDTO);
-        return ResponseEntity.ok("Update category successfully");
+        Locale locale = localeResolver.resolveLocale(request);
+        return ResponseEntity.ok(UpdateCategoryResponse.builder()
+                .message(messageSource.getMessage("category.create_category.create_successfully",null,locale))
+                .build());
     }
 
     //xóa category
