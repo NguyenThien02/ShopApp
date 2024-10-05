@@ -1,6 +1,6 @@
 package com.example.ShopApp.services;
 
-import com.example.ShopApp.components.JwtTokenUtil;
+import com.example.ShopApp.components.JwtTokenUtils;
 import com.example.ShopApp.dtos.UserDTO;
 import com.example.ShopApp.exceptions.DataNotFoundException;
 import com.example.ShopApp.exceptions.InvalidParamException;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
