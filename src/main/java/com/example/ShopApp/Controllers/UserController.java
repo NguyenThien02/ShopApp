@@ -47,18 +47,26 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody UserLoginDTO userLoginDTO) {
-//       //Kiểm tra thông tin đăng nhập và sinh token
-        try{
-            String token = userService.login(userLoginDTO.getPhoneNumber(),userLoginDTO.getPassword());
+            @Valid @RequestBody UserLoginDTO userLoginDTO
+    ) {
+        // Kiểm tra thông tin đăng nhập và sinh token
+        try {
+            String token = userService.login(
+                    userLoginDTO.getPhoneNumber(),
+                    userLoginDTO.getPassword(),
+                    userLoginDTO.getRoleId() == null ? 1 : userLoginDTO.getRoleId()
+            );
+            // Trả về token trong response
             return ResponseEntity.ok(LoginResponse.builder()
                     .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
                     .token(token)
                     .build());
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(LoginResponse.builder()
-                            .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED,e.getMessage()))
-                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    LoginResponse.builder()
+                            .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED, e.getMessage()))
+                            .build()
+            );
         }
     }
     @DeleteMapping("/{id}")

@@ -8,7 +8,7 @@ import com.example.ShopApp.models.User;
 public interface IUserService {
     User crateUser(UserDTO userDTO) throws Exception;
 
-    String login(String phoneNumber, String password) throws DataNotFoundException, InvalidParamException;// Trả về một Token key
+    String login(String phoneNumber, String password, Long roleId) throws Exception;// Trả về một Token key
 
     void deleteUser(Long id);
 }
