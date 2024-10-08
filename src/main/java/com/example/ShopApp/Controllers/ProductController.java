@@ -150,30 +150,22 @@ public class ProductController {
         return uniqueFilename;
     }
 
-    // Lấy tất cả các ảnh có productId=?
-//    @GetMapping("images/{id}")
-//    public ResponseEntity<?> getImagesAllProductById(@PathVariable("id") Long productId){
-//        List<ProductImage> productListImage = productService.allImagesProductById(productId);
-//        ArrayList<String> nameImages = new ArrayList<>();
-//        for(ProductImage productImage:productListImage){
-//            nameImages.add(productImage.getImageUrl());
-//        }
-//        return ResponseEntity.ok().body(nameImages) ;
-//    }
-
     //Lấy ra danh sách product theo trang
     @GetMapping("")
     public ResponseEntity<ProductListResponse> getProducts(
-            @RequestParam("page") int page,
-            @RequestParam("limit") int limit
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit
+
     ) {
         //Tạo ra pageable từ thông tin trang và giới hạn
-        PageRequest pageRequests = PageRequest.of(
+        PageRequest pageRequest = PageRequest.of(
                 page,
                 limit,
-                Sort.by("id").ascending());
-//                Sort.by("createdAt").descending());
-        Page<ProductResponse> productPage = productService.getAllProducts(pageRequests);
+                Sort.by("id").ascending()
+        );
+        Page<ProductResponse> productPage = productService.getAllProducts(keyword, categoryId, pageRequest);
         // Lẩy ra tổng số trang
         int totalPages = productPage.getTotalPages();
         List<ProductResponse> products = productPage.getContent();
