@@ -169,8 +169,10 @@ public class ProductController {
     ) {
         //Tạo ra pageable từ thông tin trang và giới hạn
         PageRequest pageRequests = PageRequest.of(
-                page, limit,
-        Sort.by("createdAt").descending());
+                page,
+                limit,
+                Sort.by("id").ascending());
+//                Sort.by("createdAt").descending());
         Page<ProductResponse> productPage = productService.getAllProducts(pageRequests);
         // Lẩy ra tổng số trang
         int totalPages = productPage.getTotalPages();
@@ -213,7 +215,7 @@ public class ProductController {
     }
 
     //Faker
-    //@PostMapping("/generateFakeProducts")
+//    @PostMapping("/generateFakeProducts")
     public ResponseEntity<String> generateFakeProducts() {
         Faker faker = new Faker();
         for(int i=0; i<100; i++){
@@ -226,7 +228,7 @@ public class ProductController {
                     .price((float)faker.number().numberBetween(10,90000000))
                     .description(faker.lorem().sentence())
                     .thumbnail("")
-                    .categoryId((long) faker.number().numberBetween(2,6))
+                    .categoryId((long) faker.number().numberBetween(1,6))
                     .build();
             if(!productService.existsByCategoryId(productDTO.getCategoryId())){
                 continue;

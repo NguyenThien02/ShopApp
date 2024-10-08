@@ -11,6 +11,7 @@ import com.example.ShopApp.repositories.CategoryRepository;
 import com.example.ShopApp.repositories.ProductImageRepository;
 import com.example.ShopApp.repositories.ProductRepository;
 import com.example.ShopApp.responses.ProductResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ public class ProductService implements IProductService {
     private final ProductImageRepository productImageRepository;
     //Tạo ra product mới
     @Override
+    @Transactional
     public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
         //Kiểm tra xem có Category ID trong bảng categorys ko
         Category existingCategory = categoryRepository
@@ -62,6 +64,7 @@ public class ProductService implements IProductService {
 
     //Cập nhật Product
     @Override
+    @Transactional
     public Product updateProduct(Long id, ProductDTO productDTO) throws Exception {
         Product existingProduct = getProductById(id);
         //Kiểm tra xem category trong prodcutDTO có trong bảng categorys không
@@ -117,6 +120,7 @@ public class ProductService implements IProductService {
 
     //Xóa product có id=?
     @Override
+    @Transactional
     public void deteleProduct(Long id) {
         productRepository.deleteById(id);
 //        Optional<Product> optionalProduct = productRepository.findById(id);
