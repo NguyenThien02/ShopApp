@@ -12,6 +12,7 @@ import com.example.ShopApp.services.ProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,6 +38,7 @@ import java.util.UUID;
 @Controller
 @RequestMapping("${api.prefix}/products")
 @RequiredArgsConstructor
+
 public class ProductController {
     private final ProductService productService;
 
@@ -105,6 +107,30 @@ public class ProductController {
         }
 
     }
+    //Lấy ra ảnh product
+    @GetMapping("/images/{imageName}")
+    public ResponseEntity<?> viewImage(@PathVariable("imageName") String imageName) {
+        try {
+            java.nio.file.Path imagePath = Paths.get("uploads/"+imageName);
+            //Tạo một đối tượng UrlResource từ đường dẫn hình ảnh, cho phép tải tệp hình ảnh từ hệ thống tệp của server.
+            UrlResource resource = new UrlResource(imagePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        // hình ảnh sẽ được trả về dưới định dạng JPEG.
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            } else {
+                return ResponseEntity.ok()
+                        //Nếu hình ảnh không tồn tại, hệ thống sẽ trả về một hình ảnh mặc định
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(new UrlResource(Paths.get("uploads/notfound.jpg").toUri()));
+                //return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     //Lưu file
     private String storeFile(MultipartFile file) throws IOException {
@@ -125,15 +151,15 @@ public class ProductController {
     }
 
     // Lấy tất cả các ảnh có productId=?
-    @GetMapping("images/{id}")
-    public ResponseEntity<?> getImagesAllProductById(@PathVariable("id") Long productId){
-        List<ProductImage> productListImage = productService.allImagesProductById(productId);
-        ArrayList<String> nameImages = new ArrayList<>();
-        for(ProductImage productImage:productListImage){
-            nameImages.add(productImage.getImageUrl());
-        }
-        return ResponseEntity.ok().body(nameImages) ;
-    }
+//    @GetMapping("images/{id}")
+//    public ResponseEntity<?> getImagesAllProductById(@PathVariable("id") Long productId){
+//        List<ProductImage> productListImage = productService.allImagesProductById(productId);
+//        ArrayList<String> nameImages = new ArrayList<>();
+//        for(ProductImage productImage:productListImage){
+//            nameImages.add(productImage.getImageUrl());
+//        }
+//        return ResponseEntity.ok().body(nameImages) ;
+//    }
 
     //Lấy ra danh sách product theo trang
     @GetMapping("")

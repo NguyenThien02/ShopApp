@@ -47,32 +47,33 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 return;
             }
-                final String token = authHeader.substring(7);
-                final String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
-                if(phoneNumber != null
-                        && SecurityContextHolder.getContext().getAuthentication()==null){
-                    User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
-                    if(jwtTokenUtil.validateToken(token,userDetails)){
-                        UsernamePasswordAuthenticationToken authenticationToken =
-                                new UsernamePasswordAuthenticationToken(
-                                        userDetails,
-                                        null,
-                                        userDetails.getAuthorities()
-                                );
-                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    }
+            final String token = authHeader.substring(7);
+            final String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
+            if(phoneNumber != null
+                    && SecurityContextHolder.getContext().getAuthentication()==null){
+                User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
+                if(jwtTokenUtil.validateToken(token,userDetails)){
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
-                filterChain.doFilter(request, response);
+            }
+            filterChain.doFilter(request, response);
         }catch (Exception e){
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
     }
- //   Kiểm tra xem yêu cầu HTTP có nằm trong danh sách các đường dẫn và phương thức HTTP được cho phép bypass (bỏ qua) xác thực hay không.
+    //   Kiểm tra xem yêu cầu HTTP có nằm trong danh sách các đường dẫn và phương thức HTTP được cho phép bypass (bỏ qua) xác thực hay không.
     private boolean isBypassToken(@NonNull HttpServletRequest request){
         final List<Pair<String,String>> bypassTokens = Arrays.asList(
                 Pair.of(String.format("%s/roles", apiPrefix), "GET"),
                 Pair.of(String.format("%s/products",apiPrefix),"GET"),
+
                 Pair.of(String.format("%s/categories", apiPrefix), "GET"),
                 Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
                 Pair.of(String.format("%s/users/login",apiPrefix), "POST")
