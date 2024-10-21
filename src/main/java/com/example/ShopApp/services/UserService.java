@@ -103,4 +103,9 @@ public class UserService implements IUserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+    @Override
+    public User getUserById(long id) throws DataNotFoundException {
+        return userRepository.findById(id).
+                orElseThrow(() -> new DataNotFoundException("Khong tim thay user"));
+    }
 }

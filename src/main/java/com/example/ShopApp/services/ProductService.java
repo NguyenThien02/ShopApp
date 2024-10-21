@@ -134,4 +134,10 @@ public class ProductService implements IProductService {
         productRepository.deleteAll();
     }
 
+    //Tàm danh sách các product theo danh sách các productId
+    @Override
+    public List<Product> findProductsByIds(List<Long> productIds) {
+        return productRepository.findProductsByIds(productIds);
+    }
+
 }

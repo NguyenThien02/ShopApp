@@ -32,4 +32,6 @@ public interface IProductService {
     List<ProductImage> allImagesProductById(Long productId);
 
     boolean existsByCategoryId(Long categoryId);
+
+    List<Product> findProductsByIds(List<Long> productIds);
 }

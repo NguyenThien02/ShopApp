@@ -11,4 +11,5 @@ public interface IUserService {
     String login(String phoneNumber, String password, Long roleId) throws Exception;// Trả về một Token key
 
     void deleteUser(Long id);
+    User getUserById(long id) throws DataNotFoundException;
 }

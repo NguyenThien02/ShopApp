@@ -74,4 +74,16 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok("delete user with id: " + id);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(
+            @PathVariable("id")
+            Long id) {
+        try{
+            User user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
