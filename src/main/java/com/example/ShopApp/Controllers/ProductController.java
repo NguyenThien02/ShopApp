@@ -174,11 +174,18 @@ public class ProductController {
                         .totalPages(totalPages)
                         .build());
     }
-    //Lấy ra một product có Id=?
+    //http://localhost:8088/api/v1/products/6
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable("id") Long productId) throws Exception {
-        Product existingProduct = productService.getProductById(productId);
-        return ResponseEntity.ok().body(ProductResponse.fromProduct(existingProduct)) ;
+    public ResponseEntity<?> getProductById(
+            @PathVariable("id") Long productId
+    ) {
+        try {
+            Product existingProduct = productService.getProductById(productId);
+            return ResponseEntity.ok(ProductResponse.fromProduct(existingProduct));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
     // Xóa Product với id =?
